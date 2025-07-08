@@ -1,0 +1,114 @@
+.elements {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  grid-template-rows: repeat(2, auto);
+  max-width: 880px;
+  width: 100%;
+  gap: 0 20px;
+  margin: auto;
+  padding: 0 20px 0 20px;
+  box-sizing: border-box;
+}
+
+.elements__group {
+  position: relative;
+  max-width: 282px;
+  width: 100%;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  aspect-ratio: 2/4;
+  max-height: 400px;
+}
+
+.elements__image {
+  max-width: 282px;
+  width: 100%;
+  height: 282px;
+  object-fit: cover;
+  border-radius: 10px 10px 0 0;
+}
+
+.elements__rectangle {
+  max-width: 282px;
+  width: 100%;
+  background-color: white;
+  padding: 31px 21px;
+  box-sizing: border-box;
+  border-radius: 0 0 10px 10px;
+  display: flex;
+  align-items: center;
+}
+
+.elements__paragraph {
+  max-width: 246px;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  font-family: "Inter", "Arial", "Helvetica", sans-serif;
+  font-style: normal;
+  font-weight: 900;
+  font-size: 24px;
+  line-height: 29px;
+  color: #000000;
+}
+
+.elements__heart {
+  border: none;
+  background: url(https://practicum-content.s3.us-west-1.amazonaws.com/web-code/dom/moved_heart.svg)
+    center no-repeat;
+  background-size: 100%;
+  cursor: pointer;
+  height: 21px;
+  width: 19px;
+  right: 10px;
+  transition: 0.3s;
+  margin-left: 8px;
+}
+
+.elements__heart:hover {
+  transform: scale(1.3);
+  opacity: 80%;
+}
+
+.elements__heart_active {
+  background: url(https://practicum-content.s3.us-west-1.amazonaws.com/web-code/dom/moved_heart-filled.svg)
+    center no-repeat;
+}
+
+.elements__remove {
+  width: 18px;
+  height: 19.3px;
+  position: absolute;
+  right: 15px;
+  top: 28px;
+  z-index: 1;
+  transition: 0.3s;
+}
+
+.elements__remove:hover {
+  transform: scale(1.3);
+}
+
+@media screen and (max-width: 768px) {
+  .elements {
+    max-width: 584px;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    padding: 20px;
+    box-sizing: border-box;
+  }
+
+  @media screen and (max-width: 450px) {
+    .elements {
+      max-width: 320px;
+      grid-template-columns: auto;
+      grid-template-rows: repeat(6, 1fr);
+      justify-content: center;
+      padding: 10px;
+      box-sizing: border-box;
+    }
+  }
+}
