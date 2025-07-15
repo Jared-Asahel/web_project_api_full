@@ -7,13 +7,15 @@ const { errors } = require("celebrate");
 const usersRouter = require("./routes/users");
 const cardsRouter = require("./routes/cards");
 const auth = require("./middlewares/auth");
-const NotFoundError = require("./errors/not-found"); // mejor usar destructuring si exportas varios
+const NotFoundError = require("./errors/not-found");
+const errorHandler = require("./errors/error-handler");
 const { createUser } = require("./controllers/users");
 const { login } = require("./controllers/login");
 const {
   validateCreateUser,
   validateLogin,
 } = require("./middlewares/validators");
+const { requestLogger, errorLogger } = require("./middlewares/logger");
 
 const app = express();
 const { PORT = 3000 } = process.env;
@@ -23,6 +25,8 @@ mongoose.connect("mongodb://localhost:27017/aroundb", {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
+
+app.use(requestLogger);
 
 // Middleware para parsear JSON en las solicitudes
 app.use(express.json());
@@ -43,16 +47,13 @@ app.use("*", (req, res, next) => {
   next(new NotFoundError("Recurso no encontrado"));
 });
 
+app.use(errorLogger);
+
 // Errores de Celebrate (validación)
 app.use(errors());
 
 // Middleware de manejo de errores general
-app.use((err, req, res, next) => {
-  const { statusCode = 500, message } = err;
-  res.status(statusCode).send({
-    message: statusCode === 500 ? "Error interno del servidor" : message,
-  });
-});
+app.use(errorHandler);
 
 // Iniciar el servidor
 app.listen(PORT, () => {
