@@ -28,11 +28,11 @@ mongoose.connect("mongodb://localhost:27017/aroundb", {
 });
 
 // Servir archivos estáticos
-app.use(express.static(path.join(__dirname, "../frontend/build")));
+app.use(express.static(path.join(__dirname, "../frontend/dist")));
 
 // Para cualquier ruta no encontrada, devolver index.html
 app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend/build", "index.html"));
+  res.sendFile(path.join(__dirname, "../frontend/dist", "index.html"));
 });
 
 app.use(requestLogger);
