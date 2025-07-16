@@ -1,6 +1,7 @@
 // Importación de módulos
 const express = require("express");
 const mongoose = require("mongoose");
+const path = require("path");
 const { errors } = require("celebrate");
 
 // Middlewares, rutas y controladores
@@ -24,6 +25,14 @@ const { PORT = 3000 } = process.env;
 mongoose.connect("mongodb://localhost:27017/aroundb", {
   useNewUrlParser: true,
   useUnifiedTopology: true,
+});
+
+// Servir archivos estáticos
+app.use(express.static(path.join(__dirname, "../frontend/build")));
+
+// Para cualquier ruta no encontrada, devolver index.html
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "../frontend/build", "index.html"));
 });
 
 app.use(requestLogger);
