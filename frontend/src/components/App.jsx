@@ -79,7 +79,7 @@ function App() {
     // Llama a la función, pasándole el JWT.
     tokenApi
       .getUserInfo(jwt)
-      .then(({ data }) => {
+      .then((data) => {
         // si la respuesta es exitosa, inicia la sesión del usuario, guarda sus
         // datos en el estado y lo dirige a /ducks.
         setIsLoggedIn(true);

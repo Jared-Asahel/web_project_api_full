@@ -1,3 +1,5 @@
+import { getToken } from "./token";
+
 class Api {
   constructor(options) {
     this._baseUrl = options.baseUrl;
@@ -6,7 +8,7 @@ class Api {
   // Función para obtener los headers dinámicamente
   _getHeaders() {
     return {
-      authorization: `Bearer ${localStorage.getItem("jwt")}`,
+      authorization: `Bearer ${getToken()}`,
       "Content-Type": "application/json",
     };
   }

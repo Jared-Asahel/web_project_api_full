@@ -28,6 +28,7 @@ mongoose.connect("mongodb://localhost:27017/aroundb", {
 });
 
 app.use(cors());
+app.options("/*splat", cors());
 
 // Servir archivos estáticos
 app.use(express.static(path.join(__dirname, "../frontend/dist")));
