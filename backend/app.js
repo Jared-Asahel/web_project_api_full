@@ -8,7 +8,6 @@ const { errors } = require("celebrate");
 const usersRouter = require("./routes/users");
 const cardsRouter = require("./routes/cards");
 const auth = require("./middlewares/auth");
-const NotFoundError = require("./errors/not-found");
 const errorHandler = require("./errors/error-handler");
 const { createUser } = require("./controllers/users");
 const { login } = require("./controllers/login");
@@ -30,11 +29,6 @@ mongoose.connect("mongodb://localhost:27017/aroundb", {
 // Servir archivos estáticos
 app.use(express.static(path.join(__dirname, "../frontend/dist")));
 
-// Para cualquier ruta no encontrada, devolver index.html
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend/dist", "index.html"));
-});
-
 app.use(requestLogger);
 
 // Middleware para parsear JSON en las solicitudes
@@ -51,15 +45,15 @@ app.use(auth);
 app.use("/users", usersRouter);
 app.use("/cards", cardsRouter);
 
-// Ruta no encontrada (para cualquier otra URL)
-app.use("*", (req, res, next) => {
-  next(new NotFoundError("Recurso no encontrado"));
-});
-
 app.use(errorLogger);
 
 // Errores de Celebrate (validación)
 app.use(errors());
+
+// Para cualquier ruta no encontrada, devolver index.html
+app.get("/*splat", (req, res) => {
+  res.sendFile(path.join(__dirname, "../frontend/dist/index.html"));
+});
 
 // Middleware de manejo de errores general
 app.use(errorHandler);

@@ -5,7 +5,7 @@ const UnauthorizedError = require("../errors/unauthorized");
 
 const { JWT_SECRET = "some-secret-key" } = process.env;
 
-module.exports.login = (req, res, next) => {
+const login = (req, res, next) => {
   const { email, password } = req.body;
 
   return User.findOne({ email })
@@ -29,3 +29,5 @@ module.exports.login = (req, res, next) => {
     })
     .catch(next);
 };
+
+module.exports = { login };
