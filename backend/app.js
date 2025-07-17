@@ -2,6 +2,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const path = require("path");
+const cors = require("cors");
 const { errors } = require("celebrate");
 
 // Middlewares, rutas y controladores
@@ -25,6 +26,8 @@ mongoose.connect("mongodb://localhost:27017/aroundb", {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
+
+app.use(cors());
 
 // Servir archivos estáticos
 app.use(express.static(path.join(__dirname, "../frontend/dist")));
