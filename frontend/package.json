@@ -8,7 +8,7 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "deploy" : "npm run build && scp -r dist/* dist/.* barrancojared577@webaround.jumpingcrab.com:/home/barrancojared577/frontend || true"
+    "deploy": "npm run build && scp -r ./dist/* barrancojared577@webaround.jumpingcrab.com:/home/barrancojared577/frontend || true"
   },
   "dependencies": {
     "react": "^19.0.0",

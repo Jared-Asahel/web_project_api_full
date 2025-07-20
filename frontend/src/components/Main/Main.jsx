@@ -6,26 +6,59 @@ import Popup from "./components/Popup/Popup";
 import NewCard from "./components/Popup/NewCard/NewCard";
 import EditProfile from "./components/Popup/EditProfile/EditProfile";
 import EditAvatar from "./components/Popup/EditAvatar/EditAvatar";
+import { api } from "../../utils/api";
 
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 
 // Importación del contexto del usuario
 import CurrentUserContext from "../../contexts/CurrentUserContext";
 
 // Componente Main que muestra el perfil y las tarjetas
-const Main = (props) => {
+const Main = () => {
   // Obtener la información del usuario desde el contexto
-  const { currentUser } = useContext(CurrentUserContext);
+  const { currentUser, setCurrentUser, handleUpdateAvatar, handleUpdateUser } =
+    useContext(CurrentUserContext);
 
-  // Desestructuración de las props recibidas
-  const {
-    cards,
-    onCardLike,
-    onCardDelete,
-    onAddCard, // Nueva prop para añadir tarjeta
-    onUpdateUser, // Nueva prop para actualizar perfil
-    onUpdateAvatar, // Nueva prop para actualizar avatar
-  } = props;
+  const [cards, setCards] = useState([]);
+
+  async function handleCardLike(card) {
+    const isLiked = card.isLiked;
+
+    await api
+      .likeCard(card._id, isLiked)
+      .then((newCard) => {
+        setCards((state) =>
+          state.map((currentCard) =>
+            currentCard._id === card._id ? newCard : currentCard
+          )
+        );
+      })
+      .catch((error) => console.error(error));
+  }
+
+  async function handleCardDelete(card) {
+    try {
+      const deletedCard = await api.deleteCard(card._id); // si hay error aquí, se va al catch
+      setCards((state) =>
+        state.filter((currentCard) => currentCard._id !== deletedCard._id)
+      );
+    } catch (error) {
+      if (error.status === 403) {
+        alert("No tienes permiso para eliminar esta tarjeta.");
+      } else {
+        console.error("Error al eliminar la tarjeta:", error);
+      }
+    }
+  }
+
+  function handleAddCard(data) {
+    api
+      .createCard(data)
+      .then((newData) => {
+        setCards([newData, ...cards]);
+      })
+      .catch((err) => console.error(err));
+  }
 
   // Estado para manejar el popup activo
   const [popup, setPopup] = useState(null);
@@ -37,21 +70,45 @@ const Main = (props) => {
   const popupEditAvatar = {
     title: "Cambiar foto de perfil",
     children: (
-      <EditAvatar onClose={closePopup} onUpdateAvatar={onUpdateAvatar} />
+      <EditAvatar onClose={closePopup} onUpdateAvatar={handleUpdateAvatar} />
     ),
   };
 
   // Configuración del popup para editar perfil
   const popupEditPerfil = {
     title: "Editar Perfil",
-    children: <EditProfile onClose={closePopup} onUpdateUser={onUpdateUser} />,
+    children: (
+      <EditProfile onClose={closePopup} onUpdateUser={handleUpdateUser} />
+    ),
   };
 
   // Configuración del popup para añadir una nueva tarjeta
   const popupAddCard = {
     title: "Nuevo Lugar",
-    children: <NewCard onClose={closePopup} onAddCard={onAddCard} />,
+    children: <NewCard onClose={closePopup} onAddCard={handleAddCard} />,
   };
+
+  useEffect(() => {
+    api
+      .getInitialCards()
+      .then((res) => {
+        setCards(res);
+      })
+      .catch((err) => {
+        console.error("Error al cargar las tarjetas:", err);
+      });
+  }, []);
+
+  useEffect(() => {
+    api
+      .getUserInformation()
+      .then((res) => {
+        setCurrentUser(res);
+      })
+      .catch((err) => {
+        console.error("Error al obtener la información del usuario:", err);
+      });
+  }, []);
 
   return (
     <main className="content">
@@ -127,8 +184,8 @@ const Main = (props) => {
             onClick={(popupImage) => {
               setPopup(popupImage);
             }}
-            onCardLike={onCardLike}
-            onCardDelete={onCardDelete}
+            onCardLike={handleCardLike}
+            onCardDelete={handleCardDelete}
           />
         ))}
       </section>

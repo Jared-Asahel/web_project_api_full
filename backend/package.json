@@ -8,7 +8,10 @@
     "lint": "npx eslint .",
     "dev": "nodemon app.js",
     "start": "node app.js",
-    "lint:fix": "npx eslint . --fix"
+    "lint:fix": "npx eslint . --fix",
+    "upload:backend": "rsync -av --exclude='node_modules' --exclude='.git' --exclude='.env' ./ barrancojared577@webaround.jumpingcrab.com:/home/barrancojared577/web_project_api_full/backend",
+    "restart:backend": "ssh barrancojared577@webaround.jumpingcrab.com 'cd /home/barrancojared577/web_project_api_full/backend && npm install && pm2 restart backend'",
+    "deploy:backend": "npm run upload:backend && npm run restart:backend"
   },
   "repository": {
     "type": "git",

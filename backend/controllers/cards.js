@@ -3,8 +3,19 @@ const NotFoundError = require("../errors/not-found");
 const ForbiddenError = require("../errors/forbidden");
 
 const getCards = (req, res, next) => {
+  const userId = req.user._id;
+
   Card.find({})
-    .then((cards) => res.status(200).send(cards))
+    .then((cards) => {
+      // ✅ Añadido: isLiked para cada tarjeta según si el usuario actual le dio like
+      const cardsWithIsLiked = cards.map((card) => {
+        const isLiked = card.likes.some(
+          (likeId) => likeId.toString() === userId
+        );
+        return { ...card.toObject(), isLiked };
+      });
+      res.send(cardsWithIsLiked);
+    })
     .catch(next);
 };
 
@@ -13,7 +24,11 @@ const createCard = (req, res, next) => {
   const owner = req.user._id;
 
   Card.create({ name, link, owner })
-    .then((card) => res.status(201).send(card))
+    .then((card) => {
+      // ✅ Añadido: isLiked también en la respuesta de creación
+      const isLiked = card.likes.includes(req.user._id);
+      res.status(201).send({ ...card.toObject(), isLiked });
+    })
     .catch((err) => {
       if (err.name === "ValidationError") {
         const error = new Error("Datos inválidos al crear la tarjeta");
@@ -30,33 +45,32 @@ const deleteCard = (req, res, next) => {
   Card.findById(cardId)
     .orFail(() => new NotFoundError("Tarjeta no encontrada"))
     .then((card) => {
+      // ✅ Validación de propietario antes de borrar
       if (card.owner.toString() !== req.user._id) {
         throw new ForbiddenError(
           "No tienes permiso para eliminar esta tarjeta"
         );
       }
 
-      return card
-        .deleteOne()
-        .then(() => res.send({ message: "Tarjeta eliminada correctamente" }));
+      return card.deleteOne().then(() => res.send(card));
     })
     .catch(next);
 };
 
 const likeCard = (req, res, next) => {
+  const userId = req.user._id; // ✅ Corrección: se usa userId, no el ID de la tarjeta
+
   Card.findByIdAndUpdate(
     req.params.cardId,
-    {
-      $addToSet: { likes: req.params.cardId },
-    },
+    { $addToSet: { likes: userId } }, // ✅ Corrección: se agrega el ID del usuario, no de la tarjeta
     { new: true }
   )
-    .orFail(() => {
-      const error = new Error("Tarjeta no encontrada");
-      error.statusCode = 404;
-      throw error;
+    .orFail(() => new NotFoundError("Tarjeta no encontrada"))
+    .then((card) => {
+      // ✅ Añadido: isLiked actualizado en la respuesta
+      const isLiked = card.likes.some((likeId) => likeId.toString() === userId);
+      res.send({ ...card.toObject(), isLiked });
     })
-    .then((card) => res.send(card))
     .catch((err) => {
       if (err.name === "CastError") {
         const error = new Error("ID de tarjeta inválido");
@@ -68,19 +82,19 @@ const likeCard = (req, res, next) => {
 };
 
 const dislikeCard = (req, res, next) => {
+  const userId = req.user._id; // ✅ Corrección: igual que en likeCard
+
   Card.findByIdAndUpdate(
     req.params.cardId,
-    {
-      $pull: { likes: req.params.cardId },
-    },
+    { $pull: { likes: userId } }, // ✅ Corrección: se elimina el ID del usuario, no de la tarjeta
     { new: true }
   )
-    .orFail(() => {
-      const error = new Error("Tarjeta no encontrada");
-      error.statusCode = 404;
-      throw error;
+    .orFail(() => new NotFoundError("Tarjeta no encontrada"))
+    .then((card) => {
+      // ✅ Añadido: isLiked actualizado tras quitar el like
+      const isLiked = card.likes.some((likeId) => likeId.toString() === userId);
+      res.send({ ...card.toObject(), isLiked });
     })
-    .then((card) => res.send(card))
     .catch((err) => {
       if (err.name === "CastError") {
         const error = new Error("ID de tarjeta inválido");

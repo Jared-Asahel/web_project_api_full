@@ -23,7 +23,6 @@ import { setToken, getToken } from "../utils/token";
 
 function App() {
   const [currentUser, setCurrentUser] = useState({});
-  const [cards, setCards] = useState([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userData, setUserData] = useState({ email: "" });
   const location = useLocation();
@@ -82,34 +81,10 @@ function App() {
       .then((data) => {
         // si la respuesta es exitosa, inicia la sesión del usuario, guarda sus
         // datos en el estado y lo dirige a /ducks.
-        setIsLoggedIn(true);
         setUserData({ email: data.email });
+        setIsLoggedIn(true);
       })
       .catch(console.error);
-  }, []);
-
-  //---------------------------------------------------------------------------
-
-  useEffect(() => {
-    api
-      .getUserInformation()
-      .then((res) => {
-        setCurrentUser(res);
-      })
-      .catch((err) => {
-        console.error("Error al obtener la información del usuario:", err);
-      });
-  }, []);
-
-  useEffect(() => {
-    api
-      .getInitialCards()
-      .then((res) => {
-        setCards(res);
-      })
-      .catch((err) => {
-        console.error("Error al cargar las tarjetas:", err);
-      });
   }, []);
 
   const handleUpdateUser = (data) => {
@@ -130,45 +105,11 @@ function App() {
       .catch((err) => console.error(err));
   };
 
-  async function handleCardLike(card) {
-    const isLiked = card.isLiked;
-
-    await api
-      .likeCard(card._id, isLiked)
-      .then((newCard) => {
-        setCards((state) =>
-          state.map((currentCard) =>
-            currentCard._id === card._id ? newCard : currentCard
-          )
-        );
-      })
-      .catch((error) => console.error(error));
-  }
-
-  async function handleCardDelete(card) {
-    api
-      .deleteCard(card._id)
-      .then(() => {
-        setCards((state) =>
-          state.filter((currentCard) => currentCard._id !== card._id)
-        );
-      })
-      .catch((error) => console.error("Error al eliminar la tarjeta:", error));
-  }
-
-  function handleAddCard(data) {
-    api
-      .createCard(data)
-      .then((newData) => {
-        setCards([newData, ...cards]);
-      })
-      .catch((err) => console.error(err));
-  }
-
   return (
     <CurrentUserContext.Provider
       value={{
         currentUser,
+        setCurrentUser,
         handleUpdateUser,
         handleUpdateAvatar,
         setIsLoggedIn,
@@ -204,14 +145,7 @@ function App() {
                   email="email"
                   setIsLoggedIn={setIsLoggedIn}
                 />
-                <Main
-                  cards={cards}
-                  onCardLike={handleCardLike}
-                  onCardDelete={handleCardDelete}
-                  onAddCard={handleAddCard}
-                  onUpdateUser={handleUpdateUser}
-                  onUpdateAvatar={handleUpdateAvatar}
-                />
+                <Main />
                 <Footer />
               </div>
             </ProtectedRoute>
