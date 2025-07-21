@@ -1,18 +1,10 @@
-# Node modules
+# Node.js
 node_modules/
-
-# Logs
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Builds
+.env
 dist/
 build/
-
-# Env files
-.env
-
-# Sistema
+.nyc_output/
+coverage/
+.vscode/
 .DS_Store
-Thumbs.db
+*.log
