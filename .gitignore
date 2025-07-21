@@ -1,18 +1,18 @@
-# Ignorar node_modules globales
-**/node_modules/
+# Node modules
+node_modules/
 
-# Ignorar dist de cualquier parte
-**/dist/
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
-# Ignorar logs
-*.log
+# Builds
+dist/
+build/
 
-# Ignorar archivos del sistema/editor
-.DS_Store
-.vscode/
-
-# Ignorar variables de entorno
+# Env files
 .env
 
-request.log
-error.log
+# Sistema
+.DS_Store
+Thumbs.db
